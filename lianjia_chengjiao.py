@@ -100,9 +100,9 @@ def get_chengjiao_info(url:str) -> List[List[str]]:
             listTOM = house.fine("div", class_="dealCycleeInfo").find("span", class_="dealCycleTxt")
             listTOMall = listTOM.find_all("span", recursive=False) #仅查找直接子集
             listprice = listTOMall[0].get_text(strip=True)
-            TOM = listTOMall[1].get_text(strip=True)
+            tom = listTOMall[1].get_text(strip=True)
 
-            row = [id, estate_name, dealDate, area, houseprice, unitprice, direction, floor, listprice, TOM, bedroom_num, living_room_num, link]
+            row = [id, estate_name, dealDate, area, houseprice, unitprice, direction, floor, listprice, tom, bedroom_num, living_room_num, link]
 
             ###详情页label数据
             field_mapping = {
@@ -111,7 +111,13 @@ def get_chengjiao_info(url:str) -> List[List[str]]:
                 "调价（次）": "price_adjustments",
                 "带看（次）": "property_views",
                 "关注（人）": "followers",
-                "浏览（次）": "page_views"
+                "浏览（次）": "page_views",
+                "房屋户型": "type",
+                "建成年代": "age",
+                "装修年代": "decoration",
+                "梯户比例": "liftr",
+                "配备电梯": "lift",
+                "挂牌时间": "listtime"
                 }
 
             label1 = house.find('div', class_='msg').find_all('span')
@@ -168,5 +174,5 @@ def parse_house_id(url:str) -> str:
 if __name__ == "__main__":
     house_info = get_chengjiao_info_by_page(1, 5)
     # TODO: 把字段对应的表头顺序一一对应补充到这里
-    info_columns = ['id', '标题', '成交日期', '链接']
+    info_columns = ['id', 'estate_name', 'dealDate', 'area', 'houseprice', 'unitprice', 'direction', 'floor', 'listprice', 'TOM', 'bedroom_num', 'living_room_num', 'listing_price','transaction_days','price_adjustments','property_views','followers','page_views','type','age','decoration','liftr','lift','listtime','link']
     save_as_csv(house_info, info_columns, '成交列表信息_P1-P5')
