@@ -8,7 +8,7 @@ import re
 # 链家基础地址
 BASE_URL = 'https://sz.lianjia.com/chengjiao/'
 # 登录后从浏览器接口中获取
-COOKIE = 'SECKEY_ABVK=PneWGxjnQ5vUuABNY0tjhvL+HebNvQt0P7XMHFz4ZVk%3D; BMAP_SECKEY=PneWGxjnQ5vUuABNY0tjhoBncaUz4KhJ4qvr7ocpkU3su1vPYfAfiuVMuy8rxsleLdVoan1yXhhPGfdcE5E9XsPemU0SXmJsUWb508lWi16y6BtCx4envlzxTkc7nU8DHhZoisY5WhJUfi2jWFTqiucT2EJYxHtfM2Zmx251cR7PuREKEEpKBbHghQVmNB3I; lianjia_uuid=547d3d52-a643-4087-9a67-e88845388c4a; _ga=GA1.2.1452629490.1740069522; crosSdkDT2019DeviceId=ev0z9w--hqoi59-6ao2hzdtadf7adw-iu6q0rpu7; ftkrc_=37fb9819-ebcd-42e4-b73f-085e8421596f; lfrc_=ec9ecc62-7a9d-4d46-9627-e6ca90b10b46; sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%221952439a73b3f0-08d9f9bbee6103-1d525636-1764000-1952439a73c8ce%22%2C%22%24device_id%22%3A%221952439a73b3f0-08d9f9bbee6103-1d525636-1764000-1952439a73c8ce%22%2C%22props%22%3A%7B%22%24latest_traffic_source_type%22%3A%22%E7%9B%B4%E6%8E%A5%E6%B5%81%E9%87%8F%22%2C%22%24latest_referrer%22%3A%22%22%2C%22%24latest_referrer_host%22%3A%22%22%2C%22%24latest_search_keyword%22%3A%22%E6%9C%AA%E5%8F%96%E5%88%B0%E5%80%BC_%E7%9B%B4%E6%8E%A5%E6%89%93%E5%BC%80%22%7D%7D; _ga_XGP5EDPZTV=GS1.2.1740324896.2.1.1740325531.0.0.0; _ga_XRDEC2G0T9=GS1.2.1740324896.2.1.1740325532.0.0.0; _ga_SNG6R1B3VY=GS1.2.1740324896.2.1.1740325534.0.0.0; select_city=440300; login_ucid=2000000467299247; lianjia_token=2.0012bd483944cc4e7a03106108be117f86; lianjia_token_secure=2.0012bd483944cc4e7a03106108be117f86; security_ticket=l8PXovPnkoIjz75RIkNpTx/2Iq6N/BmYmlchCXtJO/EnYp4WYcVDy4zmbzSortgzw94LuTb6FFBsOIeN0xekLu6PUsHG8fP9qIo0hyI4PkbdwxdeGWtREUjhY0YdmwiL4uI2pVHQGr+qt1mOLbytF0EE1A3F1VAqRvnuBjKiclo=; _jzqckmp=1; _gid=GA1.2.1275099360.1740998238; _jzqx=1.1740998231.1741001952.2.jzqsr=clogin%2Elianjia%2Ecom|jzqct=/.jzqsr=sz%2Elianjia%2Ecom|jzqct=/chengjiao/105116305030%2Ehtml; lianjia_ssid=a07c43e1-bd6c-feb3-77bd-c662b8c278d2; Hm_lvt_46bf127ac9b856df503ec2dbf942b67e=1740325246,1741012099; HMACCOUNT=F26A4887B55DF921; _qzjc=1; _jzqa=1.493861098530465800.1740325246.1741001952.1741012100.4; _jzqc=1; _jzqb=1.6.10.1741012100.1; _qzja=1.1760960081.1740325246456.1741001952445.1741012100239.1741013635888.1741013852534.0.0.0.14.4; _qzjb=1.1741012100239.6.0.0.0; _qzjto=12.3.0; srcid=eyJ0Ijoie1wiZGF0YVwiOlwiZDZlZTBmMTc2MDBkYjBmMmQ4ZWNlYzRhNGNkM2VhMGEyNjM3YTg1ZDI1NTkwYzM2MzNiYzMyNWY4MjE3YjhhZTAyNzRhYTk2MGMxZDYwNjJmZmM0ZmEwYThhYzhiNGQyM2QzYzkzM2Q5NjE1NTY4ZWI3ZDczZDJjMmMxMDM2NWEyNTU1NTQyYmY4MGY5ZjczMDczODFhZDRkYTU2MjdhN2RkMTE2MDczYzAzYmUzN2VlNGE4NTQ2NmU2NThlZWUwOTY1NmFjNjlhYmRkYjE3MTQyZTY5OWZkYTkwZGJkYTI3NmI0NDFlOWNkYzE5OTY4YjhmMzA0ZDg0ZmM1MzNjN1wiLFwia2V5X2lkXCI6XCIxXCIsXCJzaWduXCI6XCIxYTM3OWQwYVwifSIsInIiOiJodHRwczovL3N6LmxpYW5qaWEuY29tL2NoZW5namlhby8xMDUxMTk1NTQ4NDYuaHRtbCIsIm9zIjoid2ViIiwidiI6IjAuMSJ9; Hm_lpvt_46bf127ac9b856df503ec2dbf942b67e=1741013857; _ga_C4R21H79WC=GS1.2.1741012115.4.1.1741013869.0.0.0'
+COOKIE = 'lianjia_uuid=9d3aecff-1983-4cfa-ac17-8e77c5ef87ee; sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%221951344fc8b3e-0af4ecdea37a67-26011b51-3686400-1951344fc8cfa9%22%2C%22%24device_id%22%3A%221951344fc8b3e-0af4ecdea37a67-26011b51-3686400-1951344fc8cfa9%22%2C%22props%22%3A%7B%22%24latest_traffic_source_type%22%3A%22%E8%87%AA%E7%84%B6%E6%90%9C%E7%B4%A2%E6%B5%81%E9%87%8F%22%2C%22%24latest_referrer%22%3A%22https%3A%2F%2Fwww.google.com%2F%22%2C%22%24latest_referrer_host%22%3A%22www.google.com%22%2C%22%24latest_search_keyword%22%3A%22%E6%9C%AA%E5%8F%96%E5%88%B0%E5%80%BC%22%7D%7D; _ga=GA1.2.1352918855.1739785054; crosSdkDT2019DeviceId=fqfasp-vtswrp-ps90z8qjo9sauje-dndnjulqt; ftkrc_=763a75e0-0fc6-4b73-88f4-e1c19ca995f4; lfrc_=6936621a-316e-4474-81e9-3a212c9dddea; _ga_QJN1VP0CMS=GS1.2.1739785054.1.1.1739785120.0.0.0; _ga_KJTRWRHDL1=GS1.2.1739785054.1.1.1739785120.0.0.0; _ga_XLL3Z3LPTW=GS1.2.1740123937.1.0.1740123937.0.0.0; _ga_NKBFZ7NGRV=GS1.2.1740123937.1.0.1740123937.0.0.0; select_city=440300; lianjia_ssid=07f444a0-bd29-4cad-ab1d-2ea4f44ab007; _gid=GA1.2.329068500.1741855873; session_id=8858dc99-0053-e0ac-a41d-6febc854ac56; beikeBaseData=%7B%22parentSceneId%22%3A%22415745271043591937%22%7D; _ga_XRDEC2G0T9=GS1.2.1741855873.2.1.1741855900.0.0.0; _ga_XGP5EDPZTV=GS1.2.1741855872.2.1.1741855900.0.0.0; _ga_SNG6R1B3VY=GS1.2.1741855872.2.1.1741855900.0.0.0; login_ucid=2000000467299247; lianjia_token=2.00156fd99b431edfd804c2f0aae20b45da; lianjia_token_secure=2.00156fd99b431edfd804c2f0aae20b45da; security_ticket=bPxpKMZ63O2+U1y9x7TxujLwV93vYDpjiaf4+fkHx0xjvlxEG1AkFsG1Ve2znz6OcNFeUqMmKO4x/J4f5G7J5FQdOqEz1Tq7s+unkLxOcw2++d3xqgMFqgOSjpBxdkgWTVO2Ayr48FojzGeLgOAetcfs8pvTLUD7MEpg12Wi8Ew=; _jzqa=1.3386205429234372600.1739785042.1740123927.1741855952.4; _jzqc=1; _jzqx=1.1739785042.1741855952.3.jzqsr=google%2Ecom|jzqct=/.jzqsr=clogin%2Elianjia%2Ecom|jzqct=/; _jzqckmp=1; Hm_lvt_46bf127ac9b856df503ec2dbf942b67e=1739785042,1741855953; Hm_lpvt_46bf127ac9b856df503ec2dbf942b67e=1741855953; HMACCOUNT=8D2748791BA67437; _jzqb=1.1.10.1741855952.1; _ga_C4R21H79WC=GS1.2.1741855962.4.0.1741855962.0.0.0'
 # 结果储存位置
 OUT_DIR = './output'
 
@@ -63,13 +63,77 @@ def get_chengjiao_info(url:str) -> List[List[str]]:
     for house in house_list:
         try:
             ############# TODO:根据标签找到你所需要的信息 #############
+            ### 从标题中提取地产名+房间信息+面积
             title_div = house.find('div', class_='title')
             title = title_div.text.strip()
+            cleaned_text = ' '.join(title.split()) 
+            parts = cleaned_text.split(' ')
+            estate_name = parts[0]
+            room_info = parts[1]
+            area = parts[2]
+
+            ###从房间信息分别提取卧室数量+客厅数量
+            pattern = r"(\d+)室(\d+)厅"  # 匹配模式：数字+室+数字+厅
+            match = re.search(pattern, room_info)
+            if match:
+                bedroom_num = int(match.group(1))   # 卧室数量：3 → int
+                living_room_num = int(match.group(2)) # 客厅数量：1 → int
+            else: # 容错处理（如字段缺失或格式不符）
+                bedroom_num = 0 
+                living_room_num = 0
+
+            ###标题不规范处理
+            ###pattern = r"(.+?)\s+(\d+室\d+厅)\s+([\d.]+平米)"
+            ###match = re.search(pattern, cleaned_text)
+            ###if match:
+                ###estate_name, room_info, area = match.groups()
+            
             link = title_div.find('a').get('href')
             id = parse_house_id(link)
             dealDate = house.find("div", class_="dealDate").text.strip()
-            # TODO:把上面所有的变量都按字段顺序放进来
-            row = [id, title, dealDate, link] 
+            houseprice = house.find("div", class_="totalPrice").find("span", class_="number").text.strip()
+            direction = house.find("div", class_="houseInfo").get_text(strip=True)
+            floor = house.find("div", class_="positionIcon").get_text(strip=True)
+            unitprice = house.find("div", class_="unitPrice").find("span", class_="number").text.strip()
+            
+            ###挂牌+成交周期
+            listTOM = house.fine("div", class_="dealCycleeInfo").find("span", class_="dealCycleTxt")
+            listTOMall = listTOM.find_all("span", recursive=False) #仅查找直接子集
+            listprice = listTOMall[0].get_text(strip=True)
+            TOM = listTOMall[1].get_text(strip=True)
+
+            row = [id, estate_name, dealDate, area, houseprice, unitprice, direction, floor, listprice, TOM, bedroom_num, living_room_num, link]
+
+            ###详情页label数据
+            field_mapping = {
+                "挂牌价格（万）": "listing_price",
+                "成交周期（天）": "transaction_days",
+                "调价（次）": "price_adjustments",
+                "带看（次）": "property_views",
+                "关注（人）": "followers",
+                "浏览（次）": "page_views"
+                }
+
+            label1 = house.find('div', class_='msg').find_all('span')
+            label1s = {}
+            for span in label1:
+                value = span.find('label').get_text(strip=True)  # 提取数值
+                name = span.get_text(strip=True).replace(value, '')  # 提取名称
+                field_name = field_mapping.get(name)
+                if field_name:
+                    row.append(value)
+
+            label2 = house.find('div', class_='content').find_all('span') 
+            label2s = {}
+            for span in label2:
+                value = span.find('label').get_text(strip=True)  # 提取数值
+                name = span.get_text(strip=True).replace(value, '')  # 提取名称
+                label2s[name] = value   
+                field_name = field_mapping.get(name)
+                if field_name:
+                    row.append(value)
+
+            
             #########################################################
             data.append(row)
         except Exception as e:
