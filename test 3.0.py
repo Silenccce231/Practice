@@ -16,8 +16,6 @@ OUT_DIR = './output'
 """
 获得页面html解析后的soup对象
 """
-
-
 def get_html_soup(url: str) -> BeautifulSoup:
     # 设置请求头，模拟浏览器访问
     headers = {
@@ -35,8 +33,6 @@ def get_html_soup(url: str) -> BeautifulSoup:
 """
 获得成交页面所有列表页信息[[xxx,xxx],[xxx,xxx],...]
 """
-
-
 def get_chengjiao_info_by_page(start_page: int, end_page: int) -> List[List[str]]:
     all_data = []
     # 遍历每一页得到
@@ -57,8 +53,6 @@ def get_chengjiao_info_by_page(start_page: int, end_page: int) -> List[List[str]
 """
 获得单个成交页面的信息[[xxx,xxx],[xxx,xxx],...]
 """
-
-
 def get_chengjiao_info(url: str) -> List[List[str]]:
     soup = get_html_soup(url)
     if soup == None:
@@ -69,20 +63,13 @@ def get_chengjiao_info(url: str) -> List[List[str]]:
     for house in house_list:
         try:
             ############# TODO:根据标签找到你所需要的信息 #############
-            # title_div = house.find('div', class_='title')
-            # title = title_div.text.strip()
-            # link = title_div.find('a').get('href')
-            # id = parse_house_id(link)
-            # dealDate = house.find("div", class_="dealDate").text.strip()
-
-            # 从标题中提取地产名+房间信息+面积
             title_div = house.find('div', class_='title')
             title = title_div.text.strip()
             cleaned_text = ' '.join(title.split())
             parts = cleaned_text.split(' ')
             estate_name = parts[0]
             room_info = parts[1]
-            area = parts[2]
+            area_text = parts[2]
             area = re.search(r'\d+', area_text).group() 
 
             # 从房间信息分别提取卧室数量+客厅数量
@@ -116,115 +103,12 @@ def get_chengjiao_info(url: str) -> List[List[str]]:
             listprice = re.search(r'\d+', list_text).group()  
             tom = re.search(r'\d+', tom_text).group()  
 
-            # TODO:把上面所有的变量都按字段顺序放进来
-            row = [id, title, estate_name, area, dealDate, listprice, tom, transprice, unitprice, bedroom_num, living_room_num, direction, floor_level, link]
+            row = [id, title, estate_name, area, dealDate, transprice, listprice, tom, unitprice, direction, floor_level, bedroom_num, living_room_num, link]
             #########################################################
             data.append(row)
         except Exception as e:
             print(f"爬取 {url} 失败, 需重新登录, 错误：{e}")
     return data
-
-
-def get_chengjiao_details(url_list: List[str]) -> List[List[str]]:
-    details = []
-    for url in url_list:
-        print(f"正在爬取：{url}")
-        detail = get_chengjiao_detail(url)
-        details.append(detail)
-        # 阻塞5秒模拟人类分页访问
-        time.sleep(5)
-    return details
-
-
-"""获得单个成交页面的详情信息"""
-
-
-def get_chengjiao_detail(url: str) -> List[str]:
-    soup = get_html_soup(url)
-    if soup == None:
-        return []
-    # 返回结果为一维数组
-    data = []
-    try:
-        # 从url中解析单个成交的id
-        id = parse_house_id(url)
-        data.append(id)
-
-        # 解析线上信息
-        msg = soup.find('div', class_='msg')
-        span_tags: List[BeautifulSoup] = msg.find_all('span')
-        msg_labels = ['调价（次）', '带看（次）', '关注（人）', '浏览（次）']
-        msg_data = [''] * len(msg_labels)
-        for span in span_tags:
-            # 获得标签值
-            value = span.find('label').get_text(strip=True)
-            # 获得标签名
-            name = span.get_text(strip=True).replace(value, '')
-            if name in msg_labels:
-                # 保证返回结果和标签一致
-                index = msg_labels.index(name)
-                msg_data[index] = value
-        data += msg_data
-
-        # 解析基本属性
-        base = soup.find('div', class_='base')
-        li_tags: List[BeautifulSoup] = base.find_all('li')
-        base_labels = ['房屋户型', '建成年代', '装修情况', '梯户比例', '配备电梯','建筑类型','建筑结构']
-        base_data = [''] * len(base_labels)
-        # 新增厨卫存储位置（追加到数据末尾）
-        kitchen_idx = len(base_labels)
-        bathroom_idx = kitchen_idx + 1
-        base_data += ['', '']  # 扩展存储空间
-        #新增户梯比字段
-        ratio_idx = len(base_labels)
-        base_data += [''] 
-        for li in li_tags:
-            # 获得标签名
-            name = li.find('span').get_text(strip=True)
-            # 获得标签值
-            value = li.get_text(strip=True).replace(name, '')
-            # 处理房屋户型特殊字段
-            if name == '房屋户型':
-                # 使用正则表达式分离厨卫信息
-                kitchen = re.search(r'(\d+)厨', value).group(1) if re.search(r'\d+厨', value) else '0'
-                bathroom = re.search(r'(\d+)卫', value).group(1) if re.search(r'\d+卫', value) else '0'
-        
-                # 存储到扩展字段
-                base_data[kitchen_idx] = f"{kitchen}厨"
-                base_data[bathroom_idx] = f"{bathroom}卫"
-            #处理户梯比特殊字段
-            if name == '梯户比例':
-                match = re.search(r'(\d+)梯(\d+)户', value)
-                if match:
-                    elevators = int(match.group(1))
-                    households = int(match.group(2))
-                    # 计算梯户比（户型/电梯）
-                    ratio = households / elevators if elevators != 0 else 0
-                    base_data[ratio_idx] = f"{ratio:.1f}"  # 保留1位小数
-                else:
-                    base_data[ratio_idx] = '0.0'  # 异常值默认
-                    
-            if name in base_labels:
-                # 保证返回结果和标签一致
-                index = base_labels.index(name)
-                base_data[index] = value
-        data += base_data
-
-        # TODO: 添加交易属性信息
-    except Exception as e:
-        print(f"爬取详情页 {url} 失败, 需重新登录, 错误：{e}")
-    return data
-
-
-"""保存文件到csv"""
-
-
-def save_as_csv(data: List[List[str]], columns: List[str], file_name: str) -> None:
-    df = pd.DataFrame(data, columns=columns)
-    file_path = f'{OUT_DIR}/{file_name}.csv'
-    df.to_csv(file_path, index=False, encoding="utf-8-sig")
-    print(f"爬取完成，数据已保存到{file_path}")
-
 
 """从链接中解析house的id"""
 
@@ -241,16 +125,19 @@ def parse_house_id(url: str) -> str:
     else:
         return None
 
+"""保存文件到csv"""
+
+
+def save_as_csv(data: List[List[str]], columns: List[str], file_name: str) -> None:
+    df = pd.DataFrame(data, columns=columns)
+    file_path = f'{OUT_DIR}/{file_name}.csv'
+    df.to_csv(file_path, index=False, encoding="utf-8-sig")
+    print(f"爬取完成，数据已保存到{file_path}")
+
 
 # 程序主入口
 if __name__ == "__main__":
     house_info = get_chengjiao_info_by_page(1, 1)
     # TODO: 把字段对应的表头顺序一一对应补充到这里
-    info_columns = ['id', 'title', 'estate_name', 'area','trans_date', 'listprice', 'TOM', 'trans_price', 'unitprice', 'bedroom', 'living_room', 'direction', 'floor', 'link']
+    info_columns = ['id','title','estate_name','area','trans_date','transprice', 'listprice','TOM','unitprice', 'direction', 'floor', 'bedroom', 'living_room','link']
     save_as_csv(house_info, info_columns, '成交列表信息_P1')
-    # 拿到所有详情url
-    detail_urls = [row[-1] for row in house_info]
-    house_details = get_chengjiao_details(detail_urls)
-    detail_columns = ['id', '调价（次）', '带看（次）',
-                      '关注（人）', '浏览（次）', '房屋户型', '建成年代', '装修情况', '梯户比例', '配备电梯','建筑类型','建筑结构','厨房数目','卫生间数目','户梯比']
-    save_as_csv(house_details, detail_columns, '成交房屋详情_P1')
