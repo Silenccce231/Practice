@@ -8,7 +8,7 @@ import re
 # 链家基础地址
 BASE_URL = 'https://sz.lianjia.com/chengjiao/'
 # 登录后从浏览器接口中获取
-COOKIE = 'lianjia_uuid=03957efd-b052-49a0-aa93-ef37973cdd7e; crosSdkDT2019DeviceId=-w3922v-iyxcy5-97ut3olr53ydoh9-4hwrwxxg1; lfrc_=ca088554-12b8-46c5-80c4-a83f63b357fc; _ga=GA1.2.50611551.1741189542; sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%2219566fbc4a44fe-0a59fd2e2ee45c-26001051-1024000-19566fbc4a51455%22%2C%22%24device_id%22%3A%2219566fbc4a44fe-0a59fd2e2ee45c-26001051-1024000-19566fbc4a51455%22%2C%22props%22%3A%7B%22%24latest_traffic_source_type%22%3A%22%E7%9B%B4%E6%8E%A5%E6%B5%81%E9%87%8F%22%2C%22%24latest_referrer%22%3A%22%22%2C%22%24latest_referrer_host%22%3A%22%22%2C%22%24latest_search_keyword%22%3A%22%E6%9C%AA%E5%8F%96%E5%88%B0%E5%80%BC_%E7%9B%B4%E6%8E%A5%E6%89%93%E5%BC%80%22%7D%7D; select_city=440300; Hm_lvt_46bf127ac9b856df503ec2dbf942b67e=1741189530,1741270771,1741353858,1742009867; HMACCOUNT=7825B90E2E271E43; _qzjc=1; _jzqc=1; _jzqckmp=1; _gid=GA1.2.970280463.1742009881; lianjia_ssid=565b11d2-851e-4a3d-93a5-77f348c5738c; _jzqa=1.1154581109497148700.1741189531.1742023157.1742034362.7; _jzqx=1.1741189531.1742034362.4.jzqsr=clogin%2Elianjia%2Ecom|jzqct=/.jzqsr=hip%2Elianjia%2Ecom|jzqct=/; hip=n_j9pX7qWZBwMl2eyNWFq4wOt0A5WyHlUGCeziEYKTMhZmvBOwc2ROPSKmtQdnLOfmHVuH9_qWkaacvaBa0CkzOUnEhT5Nrv_NuW-NZAjngK40n0ETwCCN59PhzOZzHGwodvFKb3Mua-ijUsu4sR1b0sn09kjHuWSDWbFQi33AsDynkIU7WfwoPOIw%3D%3D; _gat=1; _gat_global=1; _gat_new_global=1; _gat_dianpu_agent=1; _qzja=1.2073338545.1741189530617.1742023156994.1742034362245.1742034750874.1742034760802.0.0.0.27.7; _qzjb=1.1742034362245.5.0.0.0; _qzjto=8.3.0; _jzqb=1.5.10.1742034362.1; Hm_lpvt_46bf127ac9b856df503ec2dbf942b67e=1742034761; srcid=eyJ0Ijoie1wiZGF0YVwiOlwiODRhZmRmZDUwNWQ5MjNlNmIyZjM0ZWNkNjhhOGI1Yzg4Y2M3YTg1NjIyYTg2ZWRjNjA4ZWU4MjliYjYxZjc4Y2QxZDAwYzQ3M2FkMTdlMGY1ZTdiN2FkZmM4Y2JhNzI4ZjQ3NjM5MDk2Mzc3MGM5NjQ3NThjMGZlMGM4YjYzZmMyNTg0NjA4NmYzNmU5NTAyODM1YTU1ODRiM2NlZjM5MWZmZjg3MWYzMDgzM2VkMjhlN2M1YjQ0OWZiZjdiNjc1YmJhNTM3NDljZDFjMTRhZmM1OTQ0YmEzZDYxZWZmNmQxZDk1ZjFjMjk4MTljZjJiNjM4ZmI1NjgyNDlhYjQxYlwiLFwia2V5X2lkXCI6XCIxXCIsXCJzaWduXCI6XCIzN2QyZjhhYVwifSIsInIiOiJodHRwczovL3N6LmxpYW5qaWEuY29tLyIsIm9zIjoid2ViIiwidiI6IjAuMSJ9; mp_8b1215dbcc852955566c4df66e547374_mixpanel=%7B%22distinct_id%22%3A%20%2219566fb402be7e-0a8036db9059bc-26001051-fa000-19566fb402c1395%22%2C%22%24device_id%22%3A%20%2219566fb402be7e-0a8036db9059bc-26001051-fa000-19566fb402c1395%22%2C%22%24initial_referrer%22%3A%20%22%24direct%22%2C%22%24initial_referring_domain%22%3A%20%22%24direct%22%2C%22__mps%22%3A%20%7B%7D%2C%22__mpso%22%3A%20%7B%22%24initial_referrer%22%3A%20%22%24direct%22%2C%22%24initial_referring_domain%22%3A%20%22%24direct%22%7D%2C%22__mpus%22%3A%20%7B%7D%2C%22__mpa%22%3A%20%7B%7D%2C%22__mpu%22%3A%20%7B%7D%2C%22__mpr%22%3A%20%5B%5D%2C%22__mpap%22%3A%20%5B%5D%2C%22%24search_engine%22%3A%20%22bing%22%7D; _ga_C4R21H79WC=GS1.2.1742034383.7.1.1742034772.0.0.0; login_ucid=2000000470822752; lianjia_token=2.001009a7914682e51d01a48ea0dc8c7b62; lianjia_token_secure=2.001009a7914682e51d01a48ea0dc8c7b62; security_ticket=GgOYZ+V+kGsKcnWfGptrJVD/uFNSLnYsvZpmeVD+vPy76FtqUBVpYWzY7cQsb4A/HAshaD0mFNMFvASmy4+Jy6BA80efaQ70onboPkLT4iv4JpKJMWfgu43RizAAIx2L342WliMquNiozybcwSjwLgO7z798tL+KY0rZfXXvWS8=; ftkrc_=2ab1a6e1-7332-4f25-87d3-06b0f2449800'
+COOKIE = 'lianjia_uuid=9d3aecff-1983-4cfa-ac17-8e77c5ef87ee; sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%221951344fc8b3e-0af4ecdea37a67-26011b51-3686400-1951344fc8cfa9%22%2C%22%24device_id%22%3A%221951344fc8b3e-0af4ecdea37a67-26011b51-3686400-1951344fc8cfa9%22%2C%22props%22%3A%7B%22%24latest_traffic_source_type%22%3A%22%E8%87%AA%E7%84%B6%E6%90%9C%E7%B4%A2%E6%B5%81%E9%87%8F%22%2C%22%24latest_referrer%22%3A%22https%3A%2F%2Fwww.google.com%2F%22%2C%22%24latest_referrer_host%22%3A%22www.google.com%22%2C%22%24latest_search_keyword%22%3A%22%E6%9C%AA%E5%8F%96%E5%88%B0%E5%80%BC%22%7D%7D; _ga=GA1.2.1352918855.1739785054; crosSdkDT2019DeviceId=fqfasp-vtswrp-ps90z8qjo9sauje-dndnjulqt; ftkrc_=763a75e0-0fc6-4b73-88f4-e1c19ca995f4; lfrc_=6936621a-316e-4474-81e9-3a212c9dddea; _ga_QJN1VP0CMS=GS1.2.1739785054.1.1.1739785120.0.0.0; _ga_KJTRWRHDL1=GS1.2.1739785054.1.1.1739785120.0.0.0; _ga_XLL3Z3LPTW=GS1.2.1740123937.1.0.1740123937.0.0.0; _ga_NKBFZ7NGRV=GS1.2.1740123937.1.0.1740123937.0.0.0; beikeBaseData=%7B%22parentSceneId%22%3A%22415745271043591937%22%7D; _ga_XRDEC2G0T9=GS1.2.1741855873.2.1.1741855900.0.0.0; _ga_XGP5EDPZTV=GS1.2.1741855872.2.1.1741855900.0.0.0; _ga_SNG6R1B3VY=GS1.2.1741855872.2.1.1741855900.0.0.0; _jzqc=1; Hm_lvt_46bf127ac9b856df503ec2dbf942b67e=1739785042,1741855953; HMACCOUNT=8D2748791BA67437; lianjia_ssid=e8d3da4c-bbe5-430a-8157-6ff3a426df0b; select_city=440300; login_ucid=2000000467299247; lianjia_token=2.0014294c3142584a72058465001e098e6b; lianjia_token_secure=2.0014294c3142584a72058465001e098e6b; security_ticket=WgZoG/9dlJeNBQ4zNgUQbtbDOSfrwnScAcwXSL05VlKTGDgxsb8qJ1NzFulK5SXWESQxAR/jT4CW3XIWQse3aLoBSnjlnq5s5owWJg/F25OQxFU+Ixo3e9kzKeqjYdYCk3e7bSDbsWIj/ERX26RvmjCvtq3i5JXcMWkbCjPhyfI=; _jzqa=1.3386205429234372600.1739785042.1741865488.1742355287.7; _jzqx=1.1739785042.1742355287.5.jzqsr=google%2Ecom|jzqct=/.jzqsr=clogin%2Elianjia%2Ecom|jzqct=/; _jzqckmp=1; _gid=GA1.2.304418285.1742355297; Hm_lpvt_46bf127ac9b856df503ec2dbf942b67e=1742355307; _jzqb=1.2.10.1742355287.1; _ga_C4R21H79WC=GS1.2.1742355297.7.1.1742355320.0.0.0' 
 # 结果储存位置
 OUT_DIR = './output'
 
@@ -97,7 +97,7 @@ def get_chengjiao_info(url: str) -> List[List[str]]:
             link = title_div.find('a').get('href')
             id = parse_house_id(link)
             dealDate = house.find("div", class_="dealDate").text.strip()
-            houseprice = house.find("div", class_="totalPrice").find(
+            transprice = house.find("div", class_="totalPrice").find(
                 "span", class_="number").text.strip()
             direction = house.find(
                 "div", class_="houseInfo").get_text(strip=True)
@@ -114,8 +114,7 @@ def get_chengjiao_info(url: str) -> List[List[str]]:
             tom = listTOMall[1].get_text(strip=True)
 
             # TODO:把上面所有的变量都按字段顺序放进来
-            row = [id, title, estate_name, area, dealDate, bedroom_num,
-                   living_room_num, houseprice, unitprice, direction, floor, link]
+            row = [id, title, estate_name, area, dealDate, listprice, tom,transprice, unitprice, bedroom_num, living_room_num, direction, floor, link]
             #########################################################
             data.append(row)
         except Exception as e:
@@ -151,7 +150,7 @@ def get_chengjiao_detail(url: str) -> List[str]:
         # 解析线上信息
         msg = soup.find('div', class_='msg')
         span_tags: List[BeautifulSoup] = msg.find_all('span')
-        msg_labels = ['挂牌价格（万）', '成交周期（天）', '调价（次）', '带看（次）', '关注（人）', '浏览（次）']
+        msg_labels = ['调价（次）', '带看（次）', '关注（人）', '浏览（次）']
         msg_data = [''] * len(msg_labels)
         for span in span_tags:
             # 获得标签值
@@ -167,13 +166,41 @@ def get_chengjiao_detail(url: str) -> List[str]:
         # 解析基本属性
         base = soup.find('div', class_='base')
         li_tags: List[BeautifulSoup] = base.find_all('li')
-        base_labels = ['房屋户型', '建成年代', '装修情况', '梯户比例', '配备电梯']
+        base_labels = ['房屋户型', '建成年代', '装修情况', '梯户比例', '配备电梯','建筑类型','建筑结构']
         base_data = [''] * len(base_labels)
+        # 新增厨卫存储位置（追加到数据末尾）
+        kitchen_idx = len(base_labels)
+        bathroom_idx = kitchen_idx + 1
+        base_data += ['', '']  # 扩展存储空间
+        #新增户梯比字段
+        ratio_idx = len(base_labels)
+        base_data += [''] 
         for li in li_tags:
             # 获得标签名
             name = li.find('span').get_text(strip=True)
             # 获得标签值
             value = li.get_text(strip=True).replace(name, '')
+            # 处理房屋户型特殊字段
+            if name == '房屋户型':
+                # 使用正则表达式分离厨卫信息
+                kitchen = re.search(r'(\d+)厨', value).group(1) if re.search(r'\d+厨', value) else '0'
+                bathroom = re.search(r'(\d+)卫', value).group(1) if re.search(r'\d+卫', value) else '0'
+        
+                # 存储到扩展字段
+                base_data[kitchen_idx] = f"{kitchen}厨"
+                base_data[bathroom_idx] = f"{bathroom}卫"
+            #处理户梯比特殊字段
+            if name == '梯户比例':
+                match = re.search(r'(\d+)梯(\d+)户', value)
+                if match:
+                    elevators = int(match.group(1))
+                    households = int(match.group(2))
+                    # 计算梯户比（户型/电梯）
+                    ratio = households / elevators if elevators != 0 else 0
+                    base_data[ratio_idx] = f"{ratio:.1f}"  # 保留1位小数
+                else:
+                    base_data[ratio_idx] = '0.0'  # 异常值默认
+                    
             if name in base_labels:
                 # 保证返回结果和标签一致
                 index = base_labels.index(name)
@@ -216,11 +243,11 @@ def parse_house_id(url: str) -> str:
 if __name__ == "__main__":
     house_info = get_chengjiao_info_by_page(1, 1)
     # TODO: 把字段对应的表头顺序一一对应补充到这里
-    info_columns = ['id', '标题', '成交日期', '链接']
+    info_columns = ['id', 'title', 'estate_name', 'area','trans_date', 'listprice', 'TOM', 'trans_price', 'unitprice', 'bedroom', 'living_room', 'direction', 'floor', 'link']
     save_as_csv(house_info, info_columns, '成交列表信息_P1')
     # 拿到所有详情url
     detail_urls = [row[-1] for row in house_info]
     house_details = get_chengjiao_details(detail_urls)
-    detail_columns = ['id', '挂牌价格（万）', '成交周期（天）', '调价（次）', '带看（次）',
-                      '关注（人）', '浏览（次）', '房屋户型', '建成年代', '装修情况', '梯户比例', '配备电梯']
+    detail_columns = ['id', '调价（次）', '带看（次）',
+                      '关注（人）', '浏览（次）', '房屋户型', '建成年代', '装修情况', '梯户比例', '配备电梯','建筑类型','建筑结构','厨房数目','卫生间数目','户梯比']
     save_as_csv(house_details, detail_columns, '成交房屋详情_P1')
