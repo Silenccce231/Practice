@@ -12,7 +12,6 @@ COOKIE = 'SECKEY_ABVK=3+tpEAlMaaDOuAX5EvKexgbZ8viAZtO/zGNAjeedDNk%3D; BMAP_SECKE
 # 结果储存位置
 OUT_DIR = './output'
 
-
 """
 获得页面html解析后的soup对象
 """
@@ -32,105 +31,6 @@ def get_html_soup(url: str) -> BeautifulSoup:
     return BeautifulSoup(response.text, "html.parser")
 
 
-"""
-获得成交页面所有列表页信息[[xxx,xxx],[xxx,xxx],...]
-"""
-
-
-def get_chengjiao_info_by_page(start_page: int, end_page: int) -> List[List[str]]:
-    all_data = []
-    # 遍历每一页得到
-    for page in range(start_page, end_page+1):
-        url = ''
-        if page == 1:
-            url = BASE_URL
-        else:
-            url = f"{BASE_URL}pg{page}/"
-        print(f"正在爬取：{url}")
-        page_data = get_chengjiao_info(url)
-        all_data += page_data
-        # 阻塞5秒模拟人类分页访问
-        time.sleep(5)
-    return all_data
-
-
-"""
-获得单个成交页面的信息[[xxx,xxx],[xxx,xxx],...]
-"""
-
-
-def get_chengjiao_info(url: str) -> List[List[str]]:
-    soup = get_html_soup(url)
-    if soup == None:
-        return []
-    house_list: List[BeautifulSoup] = soup.find_all('div', class_='info')
-    # 遍历house_list找到你需要的信息
-    data = []  # 二维数组
-    for house in house_list:
-        try:
-            ############# TODO:根据标签找到你所需要的信息 #############
-            title_div = house.find('div', class_='title')
-            title = title_div.text.strip()
-            cleaned_text = ' '.join(title.split())
-            parts = cleaned_text.split(' ')
-            estate_name = parts[0]
-            room_info = parts[1]
-            area_text = parts[2]
-            area = re.search(r'\d+', area_text).group() 
-
-            # 从房间信息分别提取卧室数量+客厅数量
-            pattern = r"(\d+)室(\d+)厅"  # 匹配模式：数字+室+数字+厅
-            match = re.search(pattern, room_info)
-            if match:
-                bedroom_num = int(match.group(1))   # 卧室数量：3 → int
-                living_room_num = int(match.group(2))  # 客厅数量：1 → int
-            else:  # 容错处理（如字段缺失或格式不符）
-                bedroom_num = 0
-                living_room_num = 0
-
-            link = title_div.find('a').get('href')
-            id = parse_house_id(link)
-            dealDate = house.find("div", class_="dealDate").text.strip()
-            transprice = house.find("div", class_="totalPrice").find("span", class_="number").text.strip()
-            direction = house.find("div", class_="houseInfo").get_text(strip=True)
-            floor = house.find("div", class_="positionInfo").get_text(strip=True)
-            match = re.search(r'(.+?$共?\d+层?$)', floor) #匹配到第一个括号前的内容
-            if match:
-                floor_level = match.group(1).strip()  
-            else:
-                floor_level = floor.split()[0]  # 容错处理
-            unitprice = house.find("div", class_="unitPrice").find("span", class_="number").text.strip()
-
-            # 挂牌+成交周期
-            listTOM = house.find("div", class_="dealCycleeInfo").find("span", class_="dealCycleTxt")
-            listTOMall = listTOM.find_all("span", recursive=False)  # 仅查找直接子集
-            list_text = listTOMall[0].get_text(strip=True)
-            tom_text = listTOMall[1].get_text(strip=True)
-            listprice = re.search(r'\d+', list_text).group()  
-            tom = re.search(r'\d+', tom_text).group()  
-
-            row = [id, title, estate_name, area, dealDate, transprice, listprice, tom, unitprice, direction, floor_level, bedroom_num, living_room_num, link]
-            #########################################################
-            data.append(row)
-        except Exception as e:
-            print(f"爬取 {url} 失败, 需重新登录, 错误：{e}")
-    return data
-
-
-def get_chengjiao_details(url_list: List[str]) -> List[List[str]]:
-    details = []
-    for url in url_list:
-        print(f"正在爬取：{url}")
-        detail = get_chengjiao_detail(url)
-        details.append(detail)
-        # 阻塞5秒模拟人类分页访问
-        time.sleep(5)
-    return details
-
-
-"""获得单个成交页面的详情信息"""
-
-
 def get_chengjiao_detail(url: str) -> List[str]:
     soup = get_html_soup(url)
     if soup == None:
@@ -138,10 +38,6 @@ def get_chengjiao_detail(url: str) -> List[str]:
     # 返回结果为一维数组
     data = []
     try:
-        # 从url中解析单个成交的id
-        id = parse_house_id(url)
-        data.append(id)
-
         # 解析线上信息
         msg = soup.find('div', class_='msg')
         span_tags: List[BeautifulSoup] = msg.find_all('span')
@@ -169,7 +65,7 @@ def get_chengjiao_detail(url: str) -> List[str]:
         base_data += ['', '']  # 扩展存储空间
         #新增户梯比字段
         ratio_idx = len(base_labels)
-        base_data += [''] 
+        base_data += [''] ``
         for li in li_tags:
             # 获得标签名
             name = li.find('span').get_text(strip=True)
@@ -208,7 +104,6 @@ def get_chengjiao_detail(url: str) -> List[str]:
         print(f"爬取详情页 {url} 失败, 需重新登录, 错误：{e}")
     return data
 
-
 """保存文件到csv"""
 
 
@@ -218,32 +113,11 @@ def save_as_csv(data: List[List[str]], columns: List[str], file_name: str) -> No
     df.to_csv(file_path, index=False, encoding="utf-8-sig")
     print(f"爬取完成，数据已保存到{file_path}")
 
-
-"""从链接中解析house的id"""
-
-
-def parse_house_id(url: str) -> str:
-    # 定义更通用的正则表达式模式
-    pattern = r'https?://[^/]+/chengjiao/(\d+)\.html'
-    # 使用re.search匹配URL
-    match = re.search(pattern, url)
-
-    # 如果匹配成功，返回ID
-    if match:
-        return match.group(1)
-    else:
-        return None
-
-
 # 程序主入口
 if __name__ == "__main__":
-    house_info = get_chengjiao_info_by_page(1, 1)
-    # TODO: 把字段对应的表头顺序一一对应补充到这里
-    info_columns = ['id', 'title', 'estate_name', 'area','trans_date', 'listprice', 'TOM', 'trans_price', 'unitprice', 'bedroom', 'living_room', 'direction', 'floor', 'link']
-    save_as_csv(house_info, info_columns, '成交列表信息_P1')
     # 拿到所有详情url
-    detail_urls = [row[-1] for row in house_info]
-    house_details = get_chengjiao_details(detail_urls)
+    detail_urls = 'https://sz.lianjia.com/chengjiao/105117332004.html'
+    house_details = get_chengjiao_detail(detail_urls)
     detail_columns = ['id', '调价（次）', '带看（次）',
                       '关注（人）', '浏览（次）', '房屋户型', '房屋朝向','建成年代', '装修情况', '梯户比例', '配备电梯','建筑类型','建筑结构','厨房数目','卫生间数目','户梯比']
     save_as_csv(house_details, detail_columns, '成交房屋详情_P1')
