@@ -76,7 +76,7 @@ def get_chengjiao_info(url: str) -> List[List[str]]:
             estate_name = parts[0]
             room_info = parts[1]
             area_text = parts[2]
-            area = re.search(r'\d+', area_text).group() 
+            area = re.search(r'\d+', area_text).group()
 
             # 从房间信息分别提取卧室数量+客厅数量
             pattern = r"(\d+)室(\d+)厅"  # 匹配模式：数字+室+数字+厅
@@ -91,25 +91,31 @@ def get_chengjiao_info(url: str) -> List[List[str]]:
             link = title_div.find('a').get('href')
             id = parse_house_id(link)
             dealDate = house.find("div", class_="dealDate").text.strip()
-            transprice = house.find("div", class_="totalPrice").find("span", class_="number").text.strip()
-            direction = house.find("div", class_="houseInfo").get_text(strip=True)
-            floor = house.find("div", class_="positionInfo").get_text(strip=True)
-            match = re.search(r'(.+?$共?\d+层?$)', floor) #匹配到第一个括号前的内容
+            transprice = house.find("div", class_="totalPrice").find(
+                "span", class_="number").text.strip()
+            direction = house.find(
+                "div", class_="houseInfo").get_text(strip=True)
+            floor = house.find(
+                "div", class_="positionInfo").get_text(strip=True)
+            match = re.search(r'(.+?$共?\d+层?$)', floor)  # 匹配到第一个括号前的内容
             if match:
-                floor_level = match.group(1).strip()  
+                floor_level = match.group(1).strip()
             else:
                 floor_level = floor.split()[0]  # 容错处理
-            unitprice = house.find("div", class_="unitPrice").find("span", class_="number").text.strip()
+            unitprice = house.find("div", class_="unitPrice").find(
+                "span", class_="number").text.strip()
 
             # 挂牌+成交周期
-            listTOM = house.find("div", class_="dealCycleeInfo").find("span", class_="dealCycleTxt")
+            listTOM = house.find("div", class_="dealCycleeInfo").find(
+                "span", class_="dealCycleTxt")
             listTOMall = listTOM.find_all("span", recursive=False)  # 仅查找直接子集
             list_text = listTOMall[0].get_text(strip=True)
             tom_text = listTOMall[1].get_text(strip=True)
-            listprice = re.search(r'\d+', list_text).group()  
-            tom = re.search(r'\d+', tom_text).group()  
+            listprice = re.search(r'\d+', list_text).group()
+            tom = re.search(r'\d+', tom_text).group()
 
-            row = [id, title, estate_name, area, dealDate, transprice, listprice, tom, unitprice, direction, floor_level, bedroom_num, living_room_num, link]
+            row = [id, title, estate_name, area, dealDate, transprice, listprice, tom,
+                   unitprice, direction, floor_level, bedroom_num, living_room_num, link]
             #########################################################
             data.append(row)
         except Exception as e:
@@ -161,15 +167,16 @@ def get_chengjiao_detail(url: str) -> List[str]:
         # 解析基本属性
         base = soup.find('div', class_='base')
         li_tags: List[BeautifulSoup] = base.find_all('li')
-        base_labels = ['房屋户型', '房屋朝向','建成年代', '装修情况', '梯户比例', '配备电梯','建筑类型','建筑结构']
+        base_labels = ['房屋户型', '房屋朝向', '建成年代',
+                       '装修情况', '梯户比例', '配备电梯', '建筑类型', '建筑结构']
         base_data = [''] * len(base_labels)
         # 新增厨卫存储位置（追加到数据末尾）
         kitchen_idx = len(base_labels)
         bathroom_idx = kitchen_idx + 1
         base_data += ['', '']  # 扩展存储空间
-        #新增户梯比字段
+        # 新增户梯比字段
         ratio_idx = len(base_data)
-        base_data += [''] 
+        base_data += ['']
         for li in li_tags:
             # 获得标签名
             name = li.find('span').get_text(strip=True)
@@ -178,14 +185,18 @@ def get_chengjiao_detail(url: str) -> List[str]:
             # 处理房屋户型特殊字段
             if name == '房屋户型':
                 # 使用正则表达式分离厨卫信息
-                kitchen = re.search(r'(\d+)厨', value).group(1) if re.search(r'\d+厨', value) else '0'  # 2. 提取厨房数量
-                bathroom = re.search(r'(\d+)卫', value).group(1) if re.search(r'\d+卫', value) else '0'  # 3. 提取卫生间数量
-        
+                kitchen = re.search(
+                    # 2. 提取厨房数量
+                    r'(\d+)厨', value).group(1) if re.search(r'\d+厨', value) else '0'
+                bathroom = re.search(
+                    # 3. 提取卫生间数量
+                    r'(\d+)卫', value).group(1) if re.search(r'\d+卫', value) else '0'
+
                 # 存储到扩展字段
-                base_data[kitchen_idx] = f"{kitchen}厨"
-                base_data[bathroom_idx] = f"{bathroom}卫"
-            
-            #处理户梯比特殊字段
+                base_data[kitchen_idx] = f"{kitchen}"
+                base_data[bathroom_idx] = f"{bathroom}"
+
+            # 处理户梯比特殊字段
             if name == '梯户比例':
                 match = re.search(r'(\d+)梯(\d+)户', value)
                 if match:
@@ -196,7 +207,7 @@ def get_chengjiao_detail(url: str) -> List[str]:
                     base_data[ratio_idx] = f"{ratio:.1f}"  # 保留1位小数
                 else:
                     base_data[ratio_idx] = '0.0'  # 异常值默认
-                    
+
             if name in base_labels:
                 # 保证返回结果和标签一致
                 index = base_labels.index(name)
@@ -239,11 +250,12 @@ def parse_house_id(url: str) -> str:
 if __name__ == "__main__":
     house_info = get_chengjiao_info_by_page(1, 1)
     # TODO: 把字段对应的表头顺序一一对应补充到这里
-    info_columns = ['id', 'title', 'estate_name', 'area','trans_date', 'listprice', 'TOM', 'trans_price', 'unitprice', 'bedroom', 'living_room', 'direction', 'floor', 'link']
+    info_columns = ['id', 'title', 'estate_name', 'area', 'trans_date', 'listprice', 'TOM',
+                    'trans_price', 'unitprice', 'bedroom', 'living_room', 'direction', 'floor', 'link']
     save_as_csv(house_info, info_columns, '成交列表信息_P1')
     # 拿到所有详情url
     detail_urls = [row[-1] for row in house_info]
     house_details = get_chengjiao_details(detail_urls)
     detail_columns = ['id', '调价（次）', '带看（次）',
-                      '关注（人）', '浏览（次）', '房屋户型', '房屋朝向','建成年代', '装修情况', '梯户比例', '配备电梯','建筑类型','建筑结构','厨房数目','卫生间数目','户梯比']
+                      '关注（人）', '浏览（次）', '房屋户型', '房屋朝向', '建成年代', '装修情况', '梯户比例', '配备电梯', '建筑类型', '建筑结构', '厨房数目', '卫生间数目', '户梯比']
     save_as_csv(house_details, detail_columns, '成交房屋详情_P1')
