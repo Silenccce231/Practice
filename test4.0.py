@@ -86,41 +86,40 @@ def get_chengjiao_detail(url: str) -> List[str]:
                 base_data[kitchen_idx] = f"{kitchen}"
                 base_data[bathroom_idx] = f"{bathroom}"
 
-            # # 处理户梯比特殊字段
-            # def chinese_to_num(chinese_str):
-            #     num_map = {'零': 0, '一': 1, '二': 2, '两': 2, '三': 3,
-            #                '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10}
-            #     total = 0
-            #     temp = 0
+            # 处理户梯比特殊字段
+            def chinese_to_num(chinese_str):
+                num_map = {'零': 0, '一': 1, '二': 2, '两': 2, '三': 3,
+                           '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10}
+                temp = 0
 
-            #     for char in chinese_str:
-            #         val = num_map.get(char, 0)
-            #         # 处理十的特殊情况
-            #         if char == '十':
-            #             # 当十出现在开头(如"十二")，或前无累计值时视为10
-            #             if temp == 0:
-            #                 temp = 10
-            #             # 当十出现在中间(如"二十")，前值乘以10
-            #             else:
-            #                 temp = temp * 10
-            #         else:
-            #             temp += val
+                for char in chinese_str:
+                    val = num_map.get(char, 0)
+                    # 处理十的特殊情况
+                    if char == '十':
+                        # 当十出现在开头(如"十二")，或前无累计值时视为10
+                        if temp == 0:
+                            temp = 10
+                        # 当十出现在中间(如"二十")，前值乘以10
+                        else:
+                            temp = temp * 10
+                    else:
+                        temp += val
 
-            #       # 处理纯"十"结尾的情况（如"二十"）
-            #     if '十' in chinese_str and temp < 10:
-            #         temp *= 10
-            #         return temp
+                  # 处理纯"十"结尾的情况（如"二十"）
+                if '十' in chinese_str and temp < 10:
+                    temp *= 10
+                return temp
 
             if name == '梯户比例':
-                match = re.search(r'(\d+)梯(\d+)户', value)
-                if match:
-                    elevators = int(match.group(1))
-                    households = int(match.group(2))
-                # match = re.search(
-                #     r'([零一二两三四五六七八九十]+)梯([零一二两三四五六七八九十]+)户', value)
+                # match = re.search(r'(\d+)梯(\d+)户', value)
                 # if match:
-                #     elevators = chinese_to_num(match.group(1))
-                #     households = chinese_to_num(match.group(2))
+                #     elevators = int(match.group(1))
+                #     households = int(match.group(2))
+                match = re.search(
+                    r'([零一二两三四五六七八九十]+)梯([零一二两三四五六七八九十]+)户', value)
+                if match:
+                    elevators = chinese_to_num(match.group(1))
+                    households = chinese_to_num(match.group(2))
                     # 计算梯户比（户型/电梯）
                     ratio = households / elevators if elevators != 0 else 0
                     base_data[ratio_idx] = f"{ratio:.1f}"  # 保留1位小数
