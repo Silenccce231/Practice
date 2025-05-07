@@ -197,6 +197,10 @@ def get_chengjiao_detail(url: str) -> List[str]:
                 base_data[bathroom_idx] = f"{bathroom}卫"
 
             # 处理户梯比特殊字段
+                base_data[kitchen_idx] = f"{kitchen}"
+                base_data[bathroom_idx] = f"{bathroom}"
+
+            # 处理户梯比特殊字段
             if name == '梯户比例':
                 match = re.search(r'(\d+)梯(\d+)户', value)
                 if match:
@@ -248,16 +252,14 @@ def parse_house_id(url: str) -> str:
 
 # 程序主入口
 if __name__ == "__main__":
-    test_url = 'https://sz.lianjia.com/chengjiao/105117332004.html'
-    house_details = get_chengjiao_detail(test_url)
-    print(house_details)
-    # house_info = get_chengjiao_info_by_page(1, 1)
-    # # TODO: 把字段对应的表头顺序一一对应补充到这里
-    # info_columns = ['id', 'title', 'estate_name', 'area','trans_date', 'listprice', 'TOM', 'trans_price', 'unitprice', 'bedroom', 'living_room', 'direction', 'floor', 'link']
-    # save_as_csv(house_info, info_columns, '成交列表信息_P1')
-    # # 拿到所有详情url
-    # detail_urls = [row[-1] for row in house_info]
-    # house_details = get_chengjiao_details(detail_urls)
-    # detail_columns = ['id', '调价（次）', '带看（次）',
-    #                   '关注（人）', '浏览（次）', '房屋户型', '房屋朝向','建成年代', '装修情况', '梯户比例', '配备电梯','建筑类型','建筑结构','厨房数目','卫生间数目','户梯比']
-    # save_as_csv(house_details, detail_columns, '成交房屋详情_P1')
+    house_info = get_chengjiao_info_by_page(1, 1)
+    # TODO: 把字段对应的表头顺序一一对应补充到这里
+    info_columns = ['id', 'title', 'estate_name', 'area', 'trans_date', 'listprice', 'TOM',
+                    'trans_price', 'unitprice', 'bedroom', 'living_room', 'direction', 'floor', 'link']
+    save_as_csv(house_info, info_columns, '成交列表信息_P1')
+    # 拿到所有详情url
+    detail_urls = [row[-1] for row in house_info]
+    house_details = get_chengjiao_details(detail_urls)
+    detail_columns = ['id', '调价（次）', '带看（次）',
+                      '关注（人）', '浏览（次）', '房屋户型', '房屋朝向', '建成年代', '装修情况', '梯户比例', '配备电梯', '建筑类型', '建筑结构', '厨房数目', '卫生间数目', '户梯比']
+    save_as_csv(house_details, detail_columns, '成交房屋详情_P1')
