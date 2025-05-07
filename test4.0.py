@@ -83,6 +83,10 @@ def get_chengjiao_detail(url: str) -> List[str]:
                     r'(\d+)卫', value).group(1) if re.search(r'\d+卫', value) else '0'
 
                 # 存储到扩展字段
+                base_data[kitchen_idx] = f"{kitchen}厨"
+                base_data[bathroom_idx] = f"{bathroom}卫"
+
+            # 处理户梯比特殊字段
                 base_data[kitchen_idx] = f"{kitchen}"
                 base_data[bathroom_idx] = f"{bathroom}"
 
@@ -153,6 +157,7 @@ if __name__ == "__main__":
     # 拿到所有详情url
     detail_urls = 'https://sz.lianjia.com/chengjiao/105117332004.html'
     house_details = get_chengjiao_detail(detail_urls)
+    # print(house_details)
     detail_columns = ['调价（次）', '带看（次）',
                       '关注（人）', '浏览（次）', '房屋户型', '房屋朝向', '建成年代', '装修情况', '梯户比例', '配备电梯', '建筑类型', '建筑结构', '厨房数目', '卫生间数目', '户梯比']
     save_as_csv([house_details], detail_columns, '成交房屋详情_P1')
