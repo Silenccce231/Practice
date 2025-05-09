@@ -72,7 +72,7 @@ plt.xticks(annual['Year'].unique())  # 仅显示数据中存在的年份
 plt.title('Annual Trend of Online Retail Sales (Million HKD)')
 plt.grid(True, linestyle='--', alpha=0.7)
 plt.tight_layout()
-plt.savefig('HK_annual_trend.png', dpi=300)
+plt.savefig('/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Code/balala/Practice/cross_border/HK_annual_trend.png', dpi=300)
 plt.show()
 
 # # 月度趋势图
