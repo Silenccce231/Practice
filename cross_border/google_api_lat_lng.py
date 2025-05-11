@@ -25,13 +25,11 @@ def preprocess_address(address):
         "PDM": "Podium",
         "CTR": "Centre",
         "ACR": "Arcade",
-        "E": "East",
         "TWR": "Tower",
         "PH": "Phase",
         "COM": "Commercial",
         "RD": "Road",
         "HSE": "House",
-        "C": "Central"
     }
     for abbr, full in abbreviation_map.items():
         address = address.replace(abbr, full)
