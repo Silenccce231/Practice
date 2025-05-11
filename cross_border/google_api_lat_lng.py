@@ -43,90 +43,94 @@ def preprocess_address(address):
     return address
 
 
-def should_use_street(street):
-    """判断是否优先使用STREET地址"""
-    if not isinstance(street, str) or pd.isna(street):
-        return False
+def geocode_address(address, api_key):
+    """调用Google Geocoding API获取经纬度"""
+    global current_key_idx
 
-    street = street.strip()
-    # 条件1：不含特殊符号（/和,）
-    if re.search(r"[/,]", street):
-        return False
-    # 条件2：最后一节是数字（如6-8或11A）
-    if not re.search(r"\b\d+[A-Za-z]?$", street.split()[-1]):
-        return False
-    return True
+    url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {
+        "address": address,
+        "key": api_key,
+        "region": "hk",
+        "language": "en"
+    }
 
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        data = response.json()
 
-def geocode_with_retry(address, api_key):
-    """带自动切换密钥的重试机制"""
-    global current_key_idx, FAILED_KEYS
-
-    for attempt in range(MAX_RETRIES):
-        try:
-            url = "https://maps.googleapis.com/maps/api/geocode/json"
-            params = {
-                "address": address,
-                "key": api_key,
-                "region": "hk",
-                "language": "en"
+        if data["status"] == "OK":
+            location = data["results"][0]["geometry"]["location"]
+            return {
+                "lat": location["lat"],
+                "lng": location["lng"],
+                "accuracy": data["results"][0]["geometry"]["location_type"]
             }
-
-            response = requests.get(url, params=params, timeout=15)
-            data = response.json()
-
-            if data["status"] == "OK":
-                location = data["results"][0]["geometry"]["location"]
-                accuracy = data["results"][0]["geometry"]["location_type"]
-                return {
-                    "lat": location["lat"],
-                    "lng": location["lng"],
-                    "accuracy": accuracy
-                }
-            elif data["status"] == "OVER_QUERY_LIMIT":
-                logging.warning(f"API密钥配额不足: {api_key[:5]}***")
-                FAILED_KEYS.add(api_key)
-                return None
-            else:
-                logging.warning(f"Geocoding失败: {data['status']} - {address}")
-                return None
-
-        except Exception as e:
-            logging.error(f"API请求异常: {str(e)} - {address}")
-            time.sleep(2 ** attempt)  # 指数退避
-
-    return None
+        elif data["status"] == "OVER_QUERY_LIMIT":
+            print(f"\n[警告] API密钥 {api_key[:5]}*** 超出配额，切换下一个密钥")
+            current_key_idx = (current_key_idx + 1) % len(API_KEYS)
+            return None
+        else:
+            logging.error(f"Geocoding失败：{data['status']} - 地址：{address}")
+            return None
+    except Exception as e:
+        logging.error(f"API请求异常：{str(e)} - 地址：{address}")
+        return None
 
 
 def get_priority_address(row):
-    """优化版地址选择逻辑"""
-    street = str(row["STREET"]).strip() if pd.notna(row["STREET"]) else ""
+    """强制使用BNAME，空时直接报错"""
+    # 提取BNAME数据（强制字符串化处理）
     bname = str(row["BNAME"]).strip() if pd.notna(row["BNAME"]) else ""
 
-    # 第一优先级：符合规则的STREET地址
-    if should_use_street(street):
-        return preprocess_address(street), "STREET"
+    if bname:
+        processed_address = preprocess_address(bname)
+        # 即使预处理后为空也强制使用
+        return processed_address, "BNAME"
+    else:
+        # 记录详细错误信息（含行号）
+        logging.error(f"BNAME为空 | 行号: {row.name}")
+        return "", "INVALID"
 
-    # 第二优先级：BNAME地址（移除括号内容）
-    clean_bname = re.sub(r"$.*?$", "", bname).strip()
-    if clean_bname:
-        return preprocess_address(clean_bname), "BNAME"
+# def bename_fist(row):
+#     """判断是否使用BNAME/STREET地址（BNAME优先）"""
+#     # 优先检查BNAME是否可用
+#     bname = str(row["BNAME"]).strip() if pd.notna(row["BNAME"]) else ""
+#     if bname:  # 如果BNAME非空，则不使用STREET
+#         return False
 
-    # 最后回退到STREET
-    return preprocess_address(street), "STREET"
+#     # 只有当BNAME为空时，才检查STREET
+#     street = str(row["STREET"]).strip() if pd.notna(row["STREET"]) else ""
+#     if not street:  # STREET也为空则报错
+#         logging.warning(f"行列数据缺失: BNAME和STREET均为空")
+#         return False
+
+#     # 检查STREET有效性（保留原有规则）
+#     if re.search(r"[/,]", street):  # 含特殊符号
+#         return False
+#     if not re.search(r"\b\d+[A-Za-z]?$", street.split()[-1]):  # 结尾无数字
+#         return False
+
+#     return True  # 仅当BNAME为空且STREET有效时返回True
 
 
-def compare_coordinates(new_lat, new_lng, orig_lat, orig_lng):
-    """比较新旧坐标差异"""
-    if pd.isna(new_lat) or pd.isna(orig_lat):
-        return "坐标缺失"
+# def get_priority_address(row):
+#     """优化版地址选择逻辑"""
+#     street = str(row["STREET"]).strip() if pd.notna(row["STREET"]) else ""
+#     bname = str(row["BNAME"]).strip() if pd.notna(row["BNAME"]) else ""
 
-    lat_diff = abs(round(new_lat, 2) - round(float(orig_lat), 2))
-    lng_diff = abs(round(new_lng, 2) - round(float(orig_lng), 2))
+#     # 第一优先级：BNAME地址（移除括号内容）
+#     clean_bname = re.sub(r"$.*?$", "", bname).strip()
+#     if clean_bname:
+#         return preprocess_address(clean_bname), "BNAME"
 
-    if lat_diff > 0.02 or lng_diff > 0.02:
-        return f"经度差:{lng_diff:.2f}, 纬度差:{lat_diff:.2f}"
-    return "匹配良好"
+#     # 第一优先级：符合规则的STREET地址
+#     if bename_fist(row):
+#         return preprocess_address(street), "STREET"
+
+#     # 异常处理（保持图片中的日志风格）
+#     logging.warning(f"无效地址: STREET='{street}', BNAME='{bname}'")
+#     return preprocess_address(street), "INVALID"  # 仍调用预处理保证格式统一
 
 # ------------------- 主程序 -------------------
 
@@ -134,24 +138,25 @@ def compare_coordinates(new_lat, new_lng, orig_lat, orig_lng):
 def main():
     # 读取输入文件
     try:
-        input_path = "/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Research/Projects/Cross-border/Data/lat_test.xlsx"
-        df = pd.read_excel(input_path)
+        df = pd.read_excel(
+            "/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Research/Projects/Cross-border/Data/lat_test.xlsx")
         print("成功读取文件，样本数据预览：")
-        print(df[["STREET", "BNAME", "LATITUDE", "LONGTITUDE"]].head(3))
+        print(df.head(3))
     except Exception as e:
         print(f"文件读取失败：{str(e)}")
         return
 
     # 检查必要列
-    required_columns = ["ID", "STREET", "BNAME", "LATITUDE", "LONGTITUDE"]
+    required_columns = ["STREET", "BNAME"]
     if not all(col in df.columns for col in required_columns):
-        missing = set(required_columns) - set(df.columns)
-        print(f"错误：缺少必要列 {missing}，当前列名：{df.columns.tolist()}")
+        print(f"错误：缺少必要列 {required_columns}，当前列名：{df.columns.tolist()}")
         return
 
     # 初始化结果列
-    result_cols = ["修正纬度", "修正经度", "地址来源", "精确度", "坐标比对"]
-    df[result_cols] = None
+    df["修正纬度"] = None
+    df["修正经度"] = None
+    df["地址来源"] = None
+    df["精确度"] = None
 
     # 处理每条记录
     success_count = 0
@@ -160,83 +165,38 @@ def main():
     for idx, row in pbar:
         retries = 0
         result = None
-        used_api_key = None
 
         # 获取优先级地址
         address, source = get_priority_address(row)
-        if not address:
-            df.at[idx, "坐标比对"] = "无效地址"
+        if pd.isna(address) or address == "":
+            logging.error(f"空地址：行号 {idx+2}")
             continue
 
-        # 重试逻辑（带自动密钥切换）
+        # 重试逻辑
         while retries < MAX_RETRIES and not result:
             api_key = API_KEYS[current_key_idx]
-
-            # 跳过已知失效的密钥
-            if api_key in FAILED_KEYS:
-                current_key_idx = (current_key_idx + 1) % len(API_KEYS)
-                continue
-
-            result = geocode_with_retry(address, api_key)
-            used_api_key = api_key
+            result = geocode_address(address, api_key)
 
             if result:
-                # 检查精度，如果STREET精度不足则尝试BNAME
-                if source == "STREET" and result["accuracy"] != "ROOFTOP":
-                    alt_address, _ = get_priority_address(pd.Series({
-                        "STREET": "",  # 强制使用BNAME
-                        "BNAME": row["BNAME"]
-                    }))
-                    if alt_address and alt_address != address:
-                        alt_result = geocode_with_retry(alt_address, api_key)
-                        if alt_result and alt_result["accuracy"] == "ROOFTOP":
-                            result = alt_result
-                            source = "BNAME(回退)"
-
-                # 保存结果
                 df.at[idx, "修正纬度"] = result["lat"]
                 df.at[idx, "修正经度"] = result["lng"]
                 df.at[idx, "地址来源"] = source
                 df.at[idx, "精确度"] = result["accuracy"]
-                df.at[idx, "坐标比对"] = compare_coordinates(
-                    result["lat"], result["lng"],
-                    row["LATITUDE"], row["LONGTITUDE"]
-                )
                 success_count += 1
-
-                # 更新进度条
                 pbar.set_description(
-                    f"处理中 | 成功: {success_count} | 当前密钥: {used_api_key[:5]}***"
-                )
+                    f"处理中 | 成功率: {success_count/(idx+1)*100:.1f}%")
             else:
                 retries += 1
-                # 轮换API密钥
-                current_key_idx = (current_key_idx + 1) % len(API_KEYS)
-                # 所有密钥都失效时的处理
-                if len(FAILED_KEYS) == len(API_KEYS):
-                    logging.critical("所有API密钥均已失效！")
-                    break
+                time.sleep(2**retries)  # 指数退避
 
             time.sleep(REQUEST_DELAY)
 
     # 保存结果
-    output_path = "EPRC_v3.2_geocoded.xlsx"
+    output_path = "EPRC_v3.2_test.xlsx"
     df.to_excel(output_path, index=False)
-
-    # 生成统计报告
-    stats = {
-        "总记录数": len(df),
-        "成功修正数": success_count,
-        "成功率": f"{success_count/len(df)*100:.1f}%",
-        "STREET来源占比": f"{len(df[df['地址来源'] == 'STREET'])/len(df)*100:.1f}%",
-        "ROOFTOP精度占比": f"{len(df[df['精确度'] == 'ROOFTOP'])/success_count*100:.1f}%",
-        "坐标差异较大数": len(df[df['坐标比对'].str.contains('差')])
-    }
-
-    print("\n处理完成！统计信息：")
-    for k, v in stats.items():
-        print(f"{k}: {v}")
-    print(f"\n结果已保存到：{output_path}")
+    print(f"\n处理完成！成功修正 {success_count}/{len(df)} 条记录")
+    print(f"结果已保存到：{output_path}")
+    print("精确度说明：ROOFTOP(精确到门牌) > RANGE_INTERPOLATED(区间插值) > APPROXIMATE(近似) > GEOMETRIC_CENTER(几何中心)")
 
 
 if __name__ == "__main__":
