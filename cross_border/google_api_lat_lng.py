@@ -81,7 +81,7 @@ def get_priority_address(row):
     # 提取BNAME数据（强制字符串化处理）
     bname = str(row["BNAME"]).strip() if pd.notna(row["BNAME"]) else ""
 
-    if bname:
+    if bname:  # 如果BNAME非空，则使用BNAME
         processed_address = preprocess_address(bname)
         # 即使预处理后为空也强制使用
         return processed_address, "BNAME"
@@ -137,7 +137,7 @@ def main():
     # 读取输入文件
     try:
         df = pd.read_excel(
-            "/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Research/Projects/Cross-border/Data/lat_test.xlsx")
+            "/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Research/Projects/Cross-border/Data/EPRC_v3.1.xlsx")
         print("成功读取文件，样本数据预览：")
         print(df.head(3))
     except Exception as e:
@@ -190,7 +190,7 @@ def main():
             time.sleep(REQUEST_DELAY)
 
     # 保存结果
-    output_path = "EPRC_v3.2_test.xlsx"
+    output_path = "EPRC_v3.2_0512.xlsx"
     df.to_excel(output_path, index=False)
     print(f"\n处理完成！成功修正 {success_count}/{len(df)} 条记录")
     print(f"结果已保存到：{output_path}")

@@ -11,7 +11,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s: %(message)s'
 )
-API_KEYS = ["AIzaSyA8ZpXlLMd4flDomU_egV-aIz1XTU9-a0U", "AIzaSyDo_DxyS9uZIY7_EGFHkawyWmrY7TEMe5w",
+API_KEYS = ["AIzaSyDo_DxyS9uZIY7_EGFHkawyWmrY7TEMe5w",
             "AIzaSyCDj1wexToNnyeWzdE05q19JRvRX5_DaS0"]  # 需替换为有效API密钥
 current_key_idx = 0  # 当前使用的API密钥索引
 REQUEST_INTERVAL = 2  # 请求间隔防止超限
@@ -100,7 +100,7 @@ def main():
     try:
         # 假设输入文件包含目标地点坐标
         df = pd.read_excel(
-            "/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Research/Projects/Cross-border/Data/EPRC_v3.2.xlsx")
+            "/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Research/Projects/Cross-border/Data/border_distance/border_dis_test.xlsx")
         required_cols = ["ID", "LATITUDE_NEW", "LONGTITUDE_NEW"]
         assert set(required_cols).issubset(df.columns)
         print(f"成功加载 {len(df)} 个目标地点")
@@ -144,7 +144,7 @@ def main():
             if result:
                 # 记录单个口岸数据
                 df.at[idx, f"{port_name}_time(min)"] = round(
-                    result["time"]/60, 1)
+                    result["time"]/60, 2)
                 df.at[idx, f"{port_name}_distance(km)"] = round(
                     result["distance"]/1000, 2)
                 # 记录换乘次数
@@ -158,13 +158,13 @@ def main():
         # 记录最优结果
         if nearest_port:
             df.at[idx, "nearest_port"] = nearest_port
-            df.at[idx, "min_transit_time(min)"] = round(min_time/60, 1)
+            df.at[idx, "min_transit_time(min)"] = round(min_time/60, 2)
 
         # 进度更新
         pbar.set_description(f"处理进度 | 地点:{location_id}")
 
     # 结果保存
-    df.to_excel("port_transit_results.xlsx", index=False)
+    df.to_excel("port_transit_results0512.xlsx", index=False)
     print("处理完成！结果已保存至 port_transit_results.xlsx")
 
 

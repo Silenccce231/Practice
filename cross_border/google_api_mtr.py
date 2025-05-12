@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 # 配置日志和API密钥
 logging.basicConfig(filename='error.log', level=logging.ERROR)
-API_KEYS = ["AIzaSyA8ZpXlLMd4flDomU_egV-aIz1XTU9-a0U", "AIzaSyDo_DxyS9uZIY7_EGFHkawyWmrY7TEMe5w",
+API_KEYS = ["AIzaSyDo_DxyS9uZIY7_EGFHkawyWmrY7TEMe5w",
             "AIzaSyCDj1wexToNnyeWzdE05q19JRvRX5_DaS0"]  # 替换为你的实际API密钥
 current_key_idx = 0
 MAX_RETRIES = 3
@@ -18,7 +18,7 @@ def get_nearby_subway_stations(lat, lng, api_key):
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     params = {
         "location": f"{lat},{lng}",
-        "radius": 2500,
+        "radius": 5000,
         "type": "subway_station",
         "key": api_key
     }
@@ -66,7 +66,7 @@ def process_location(location, api_key):
 
     stations = get_nearby_subway_stations(lat, lng, api_key)
     if not stations:
-        return {"nearest_subway": None, "walking_time": None, "walking_distance": None}
+        return {"nearest_subway": None, "walking_time(min)": None, "walking_distance(m)": None}
 
     # 提取地铁站坐标
     destinations = [
@@ -96,8 +96,8 @@ def process_location(location, api_key):
     if nearest_station_name:
         return {
             "nearest_subway": nearest_station_name,
-            "walking_time": round(min_time / 60, 1),  # 分钟
-            "walking_distance": nearest_distance  # 米
+            "walking_time(min)": round(min_time / 60, 2),  # 分钟
+            "walking_distance(m)": nearest_distance  # 米
         }
     else:
         return {"nearest_subway": None, "walking_time": None, "walking_distance": None}
@@ -108,7 +108,7 @@ def process_location(location, api_key):
 print("[步骤1] 正在读取Excel文件...")
 try:
     df = pd.read_excel(
-        "/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Research/Projects/Cross-border/Data/EPRC_v3.2.xlsx")  # 确保文件路径正确
+        "/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Research/Projects/Cross-border/Data/mtr_test.xlsx")  # 确保文件路径正确
     print(f"成功读取文件，共 {len(df)} 条数据")
     print("列名验证：", df.columns.tolist())  # 打印列名用于检查
 except Exception as e:
@@ -154,5 +154,5 @@ for idx, row in pbar:
 # 合并结果并保存
 print("\n[步骤3] 正在保存结果到Excel...")
 output_df = pd.concat([df, pd.DataFrame(results)], axis=1)
-output_df.to_excel("output_with_mtr.xlsx", index=False)
+output_df.to_excel("output_with_mtr0512_supple.xlsx", index=False)
 print("处理完成！结果已保存到 output_with_subway.xlsx")
