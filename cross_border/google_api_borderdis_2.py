@@ -11,7 +11,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s: %(message)s'
 )
-API_KEYS = ["AIzaSyDo_DxyS9uZIY7_EGFHkawyWmrY7TEMe5w"]  # 需替换为有效API密钥
+API_KEYS = ["AIzaSyCDj1wexToNnyeWzdE05q19JRvRX5_DaS0"]  # 需替换为有效API密钥
 current_key_idx = 0  # 当前使用的API密钥索引
 REQUEST_INTERVAL = 2  # 请求间隔防止超限
 
@@ -99,7 +99,7 @@ def main():
     try:
         # 假设输入文件包含目标地点坐标
         df = pd.read_excel(
-            "/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Research/Projects/Cross-border/Data/border_distance/border_dis_1.xlsx")
+            "/Users/yangyidi/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/Documents/Research/Projects/Cross-border/Data/border_distance/border_dis_2.xlsx")
         required_cols = ["ID", "LATITUDE_NEW", "LONGTITUDE_NEW"]
         assert set(required_cols).issubset(df.columns)
         print(f"成功加载 {len(df)} 个目标地点")
@@ -163,7 +163,7 @@ def main():
         pbar.set_description(f"处理进度 | 地点:{location_id}")
 
     # 结果保存
-    df.to_excel("port_transit_results0512_1.xlsx", index=False)
+    df.to_excel("port_transit_results0512_2.xlsx", index=False)
     print("处理完成！结果已保存至 port_transit_results.xlsx")
 
 
